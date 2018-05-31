@@ -10,6 +10,8 @@ namespace RestService
 {
     public class RailwayRestService : IRailwayRestService
     {
+        private string dbServiceAddress = "";
+        private string paymentServiceAddress = "http://payment-service-uni.apphb.com/PaymentRest.svc";
 
         // --- methods and classes for CheckUser ---
         private string CreateBadCheckResponse(string checkResult)
@@ -41,7 +43,7 @@ namespace RestService
 
         public string CheckToken(string name, string token, string ip, string userAgent)
         {
-            string paymentServiceAddress = "http://payment-service-uni.apphb.com/PaymentRest.svc";
+
             var client = new RestClient(paymentServiceAddress);
 
             var checkRequest = new RestRequest("checkPayment", Method.GET);
@@ -72,7 +74,6 @@ namespace RestService
 
         private List<Route> GetRoutesListFromDB()
         {
-            //string dbServiceAddress = "10.160.64.86:63282";
             //var client = new RestClient(dbServiceAddress);
             //var routesRequest = new RestRequest("GetDestination", Method.GET);
 
@@ -110,53 +111,81 @@ namespace RestService
 
         //--- methods for GetRouteDepartureTimes ---
 
-        private string GetTimesListFromDB(string routeFrom, string routeTo)
+        private Dictionary<string, List<string>> GetTimesDictFromDB(string routeFrom, string routeTo)
         {
-            return "";
+            var client = new RestClient(dbServiceAddress);
+
+            string relativeRequest = "/" + routeFrom + "/" + routeTo;
+            var timesRequest = new RestRequest("GetDestination" + relativeRequest, Method.GET);
+
+            var timesDict = client.Execute<Dictionary<string, List<string>>>(timesRequest);
+            return timesDict.Data;
         }
+
+        private Dictionary<string, List<string>> FilterTimesDict(Dictionary<string, List<string>> timesDict,
+                                                    string routeFrom, string routeTo)
+        {
+            // some actions with filtering
+            return timesDict;
+        }
+
 
         public string GetRouteDepartureTimes(string name, string token, string routeFrom, string routeTo)
         {
             WebOperationContext ctx = WebOperationContext.Current;
-            var checkResult = CheckUser(name, token); // false, true or expired
+            var checkResult = CheckUser(name, token);
 
             if (checkResult.ToLower() == "true")
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
-                var timesList = GetTimesListFromDB(routeFrom, routeTo);
-                return "times list";
+
+                var timesDict = GetTimesDictFromDB(routeFrom, routeTo);
+                var filterTimesDict = FilterTimesDict(timesDict, routeFrom, routeTo);
+                return JsonConvert.SerializeObject(filterTimesDict).ToString();
             }
             else
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
-                return CreateBadCheckResponse(checkResult); // "result" : ("false" | "expired")
+                return CreateBadCheckResponse(checkResult);
             }
         }
 
 
-        // --- methods for BuyTicket ---
 
-        private string BuyTicketFromDB(string routeFrom, string routeTo)
+        // --- methods for BuyTicket ---
+        private class TicketResponse
         {
-            return "";
+            int ResponseCode;
+            string ResponseMessage;
+        }
+
+
+        private TicketResponse BuyTicketFromDB(string routeFrom, string routeTo, string dateTime)
+        {
+            var client = new RestClient(dbServiceAddress);
+            string relativeRequest = "/" + routeFrom + "/" + routeTo + "/" + dateTime;
+            var buyTicketRequest = new RestRequest("GetDestination" + relativeRequest, Method.GET);
+
+            var buyTicketResponse = client.Execute<TicketResponse>(buyTicketRequest);
+            return buyTicketResponse.Data;
 
         }
 
         public string BuyTicket(string name, string token, string routeFrom, string routeTo, string dateTime)
         {
             WebOperationContext ctx = WebOperationContext.Current;
-            var checkResult = CheckUser(name, token); // false, true or expired
+            var checkResult = CheckUser(name, token);
 
             if (checkResult.ToLower() == "true")
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
-                var ticketResult = BuyTicketFromDB(routeFrom, routeTo);
-                return "ticket result";
+                var ticketResult = BuyTicketFromDB(routeFrom, routeTo, dateTime);
+                return "ticket result"; // TODO CHANGE THIS
             }
             else
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
-                return CreateBadCheckResponse(checkResult); // "result" : ("false" | "expired")
+                return CreateBadCheckResponse(checkResult);
             }
         }
 
