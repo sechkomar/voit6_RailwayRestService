@@ -1,0 +1,10 @@
+D:\VisualStudioProjects\RestService\RestService\bin\RestService.dll.config
+D:\VisualStudioProjects\RestService\RestService\bin\RestService.dll
+D:\VisualStudioProjects\RestService\RestService\bin\RestService.pdb
+D:\VisualStudioProjects\RestService\RestService\obj\Debug\RestService.csprojResolveAssemblyReference.cache
+D:\VisualStudioProjects\RestService\RestService\obj\Debug\RestService.csproj.CoreCompileInputs.cache
+D:\VisualStudioProjects\RestService\RestService\obj\Debug\RestService.dll
+D:\VisualStudioProjects\RestService\RestService\obj\Debug\RestService.pdb
+D:\VisualStudioProjects\RestService\RestService\bin\RestSharp.dll
+D:\VisualStudioProjects\RestService\RestService\bin\Newtonsoft.Json.dll
+D:\VisualStudioProjects\RestService\RestService\bin\Newtonsoft.Json.xml
