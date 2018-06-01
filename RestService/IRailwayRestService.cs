@@ -16,21 +16,21 @@ namespace RestService
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        string GetPossibleRoutes(string name, string token);
+        List<Route> GetPossibleRoutes(string name, string token);
 
 
         [WebGet(UriTemplate = "/GetRouteDepartureTimes?name={name}&token={token}&route_from={routeFrom}&route_to={routeTo}",
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        string GetRouteDepartureTimes(string name, string token, string routeFrom, string routeTo);
+        Dictionary<string, List<string>> GetRouteDepartureTimes(string name, string token, string routeFrom, string routeTo);
 
 
         [WebGet(UriTemplate = "/BuyTicket?name={name}&token={token}&route_from={routeFrom}&route_to={routeTo}&time={dateTime}",
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        string BuyTicket(string name, string token, string routeFrom, string routeTo, string dateTime);
+        TicketResponse BuyTicket(string name, string token, string routeFrom, string routeTo, string dateTime);
 
 
         //// TODO: delete from interface
@@ -53,5 +53,16 @@ namespace RestService
         [DataMember]
         public string route_from { get; set; }
     
+    }
+
+    [DataContract]
+    public class TicketResponse
+    {
+        [DataMember]
+        public int ResponseCode { get; set; }
+
+
+        [DataMember]
+        public string ResponseMessage { get; set; }
     }
 }

@@ -77,8 +77,10 @@ namespace RestService
             //var client = new RestClient(dbServiceAddress);
             //var routesRequest = new RestRequest("GetDestination", Method.GET);
 
-            //IRestResponse routesResponse = client.Execute(routesRequest);
-            //var routesRawString = routesResponse.Content;
+            //var routesResponse = client.Execute<List<Route>>(routesRequest);
+            // return routesResponse.Data; // check it
+
+            // TODO CHANGE BACK
 
             string routesRawString = "[{\"route_from\" : \"Minsk\", \"route_to\" : \"Moscow\"}," +
                 "{\"route_from\" : \"Krakow\", \"route_to\" : \"Gomel\"}]";
@@ -87,7 +89,7 @@ namespace RestService
             return routes;
         }
 
-        public string GetPossibleRoutes(string name, string token)
+        public List<Route> GetPossibleRoutes(string name, string token)
         {
             WebOperationContext ctx = WebOperationContext.Current;
             var checkResult = CheckUser(name, token); // false, true or expired
@@ -99,12 +101,12 @@ namespace RestService
 
                 // some actions maybe later
 
-                return JsonConvert.SerializeObject(routesList).ToString(); //json with routes
+                return routesList;
             }
             else
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
-                return CreateBadCheckResponse(checkResult); // "result" : ("false" | "expired")
+                return null;
             }
         }
 
@@ -120,6 +122,7 @@ namespace RestService
 
             var timesDict = client.Execute<Dictionary<string, List<string>>>(timesRequest);
             return timesDict.Data;
+
         }
 
         private Dictionary<string, List<string>> FilterTimesDict(Dictionary<string, List<string>> timesDict,
@@ -130,7 +133,7 @@ namespace RestService
         }
 
 
-        public string GetRouteDepartureTimes(string name, string token, string routeFrom, string routeTo)
+        public Dictionary<string, List<string>> GetRouteDepartureTimes(string name, string token, string routeFrom, string routeTo)
         {
             WebOperationContext ctx = WebOperationContext.Current;
             var checkResult = CheckUser(name, token);
@@ -141,23 +144,19 @@ namespace RestService
 
                 var timesDict = GetTimesDictFromDB(routeFrom, routeTo);
                 var filterTimesDict = FilterTimesDict(timesDict, routeFrom, routeTo);
-                return JsonConvert.SerializeObject(filterTimesDict).ToString();
+                return filterTimesDict;
             }
             else
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
-                return CreateBadCheckResponse(checkResult);
+                return null;
             }
         }
 
 
 
         // --- methods for BuyTicket ---
-        private class TicketResponse
-        {
-            int ResponseCode;
-            string ResponseMessage;
-        }
+
 
 
         private TicketResponse BuyTicketFromDB(string routeFrom, string routeTo, string dateTime)
@@ -171,7 +170,7 @@ namespace RestService
 
         }
 
-        public string BuyTicket(string name, string token, string routeFrom, string routeTo, string dateTime)
+        public TicketResponse BuyTicket(string name, string token, string routeFrom, string routeTo, string dateTime)
         {
             WebOperationContext ctx = WebOperationContext.Current;
             var checkResult = CheckUser(name, token);
@@ -180,12 +179,12 @@ namespace RestService
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
                 var ticketResult = BuyTicketFromDB(routeFrom, routeTo, dateTime);
-                return "ticket result"; // TODO CHANGE THIS
+                return ticketResult; // TODO CHANGE THIS
             }
             else
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
-                return CreateBadCheckResponse(checkResult);
+                return null;
             }
         }
 
