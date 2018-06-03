@@ -38,11 +38,14 @@ namespace RestService
         [OperationContract]
         TicketResponse BuyTicket(string name, string token, string routeFrom, string routeTo, string dateTime);
 
+
+        // for testing
         [WebGet(UriTemplate = "/BuyTicket1?name={name}&token={token}&route_from={routeFrom}&route_to={routeTo}&time={dateTime}",
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
         string BuyTicket1(string name, string token, string routeFrom, string routeTo, string dateTime);
+
 
         //[WebGet(UriTemplate = "/AddToServicesRegister?name={serviceName}&={token}")]
         //[OperationContract]

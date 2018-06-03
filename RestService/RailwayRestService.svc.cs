@@ -66,9 +66,9 @@ namespace RestService
             var userAgent = info.Item2;
 
 
-            // --- TODO change back ---
-            return true;
-            //return CheckToken(name, token, ip, userAgent).ToLower() == "true";
+            //// --- TODO change back ---
+            //return true;
+            return CheckToken(name, token, ip, userAgent).ToLower() == "true";
         }
 
 
@@ -76,19 +76,19 @@ namespace RestService
 
         private List<Route> GetRoutesListFromDB()
         {
-            //var client = new RestClient(dbServiceAddress);
-            //var routesRequest = new RestRequest("GetDestination", Method.GET);
+            var client = new RestClient(dbServiceAddress);
+            var routesRequest = new RestRequest("GetDestination", Method.GET);
 
-            //var routesResponse = client.Execute<List<Route>>(routesRequest);
-            // return routesResponse.Data; // check it
+            var routesResponse = client.Execute<List<Route>>(routesRequest);
+            return routesResponse.Data;
 
-            // TODO CHANGE BACK
+            //// TODO CHANGE BACK
 
-            string routesRawString = "[{\"route_from\" : \"Minsk\", \"route_to\" : \"Moscow\"}," +
-                "{\"route_from\" : \"Krakow\", \"route_to\" : \"Gomel\"}]";
+            //string routesRawString = "[{\"route_from\" : \"Minsk\", \"route_to\" : \"Moscow\"}," +
+            //    "{\"route_from\" : \"Krakow\", \"route_to\" : \"Gomel\"}]";
 
-            List<Route> routes = JsonConvert.DeserializeObject<List<Route>>(routesRawString);
-            return routes;
+            //List<Route> routes = JsonConvert.DeserializeObject<List<Route>>(routesRawString);
+            //return routes;
         }
 
         public List<Route> GetPossibleRoutes(string name, string token)
@@ -154,20 +154,20 @@ namespace RestService
 
         private Dictionary<string, List<string>> GetSheduleDictFromDB(string routeFrom, string routeTo)
         {
-            //var client = new RestClient(dbServiceAddress);
+            var client = new RestClient(dbServiceAddress);
 
-            //string relativeRequest = "/" + routeFrom + "/" + routeTo;
-            //var timesRequest = new RestRequest("GetDestination" + relativeRequest, Method.GET);
+            string relativeRequest = "/" + routeFrom + "/" + routeTo;
+            var timesRequest = new RestRequest("GetDestination" + relativeRequest, Method.GET);
 
-            //var timesDict = client.Execute<Dictionary<string, List<string>>>(timesRequest);
-            //return timesDict.Data;
-            var temp = new Dictionary<string, List<string>>
-            {
-                ["03.06.2018"] = new List<string> { "15.00", "17.00" },
-                ["07.06.2018"] = new List<string> { "11.00", "01.00" },
-                ["10.07.2018"] = new List<string> { "23.00", "11.00", "09.00" }
-            };
-            return temp;
+            var timesDict = client.Execute<Dictionary<string, List<string>>>(timesRequest);
+            return timesDict.Data;
+            //var temp = new Dictionary<string, List<string>>
+            //{
+            //    ["03.06.2018"] = new List<string> { "15.00", "17.00" },
+            //    ["07.06.2018"] = new List<string> { "11.00", "01.00" },
+            //    ["10.07.2018"] = new List<string> { "23.00", "11.00", "09.00" }
+            //};
+            //return temp;
         }
 
 
