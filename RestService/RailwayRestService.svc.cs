@@ -165,7 +165,7 @@ namespace RestService
             {
                 ["03.06.2018"] = new List<string> { "15.00", "17.00" },
                 ["07.06.2018"] = new List<string> { "11.00", "01.00" },
-                ["10.07.2018"] = new List<string> { "23.00", "11.00" }
+                ["10.07.2018"] = new List<string> { "23.00", "11.00", "09.00" }
             };
             return temp;
         }
@@ -193,17 +193,32 @@ namespace RestService
 
         // --- methods for BuyTicket ---
 
+        private string clientDelimiter = "!";
+        private string clientTimeDelimiter = ":";
+        private string dbDelimiter = " ";
+        private string dbTimeDelimiter = "-";
+
+        private string DBDateTimeFormat(string dateTime)
+        {
+            var right = dateTime.Replace(clientDelimiter, dbDelimiter).Replace(clientTimeDelimiter, dbTimeDelimiter);
+            return right;
+        }
 
 
         private TicketResponse BuyTicketFromDB(string routeFrom, string routeTo, string dateTime)
         {
             var client = new RestClient(dbServiceAddress);
-            string relativeRequest = "/" + routeFrom + "/" + routeTo + "/" + dateTime;
+            string relativeRequest = "/" + routeFrom + "/" + routeTo + "/" + DBDateTimeFormat(dateTime);
             var buyTicketRequest = new RestRequest("GetDestination" + relativeRequest, Method.GET);
 
             var buyTicketResponse = client.Execute<TicketResponse>(buyTicketRequest);
             return buyTicketResponse.Data;
 
+        }
+
+        public string BuyTicket1(string name, string token, string routeFrom, string routeTo, string dateTime)
+        {
+            return DBDateTimeFormat(dateTime);
         }
 
         public TicketResponse BuyTicket(string name, string token, string routeFrom, string routeTo, string dateTime)
@@ -215,7 +230,7 @@ namespace RestService
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
                 var ticketResult = BuyTicketFromDB(routeFrom, routeTo, dateTime);
-                return ticketResult; // TODO CHANGE THIS 
+                return ticketResult;
             }
             else
             {
