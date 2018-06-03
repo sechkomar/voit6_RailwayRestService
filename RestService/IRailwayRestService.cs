@@ -25,11 +25,11 @@ namespace RestService
         [OperationContract]
         List<string> GetRouteDepartureDates(string name, string token, string routeFrom, string routeTo);
 
-        [WebGet(UriTemplate = "/GetTimesByDate?name={name}&token={token}&date={date}",
+        [WebGet(UriTemplate = "/GetTimesByDate?name={name}&token={token}&route_from={routeFrom}&route_to={routeTo}&date={date}",
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        List<string> GetTimesByDate(string name, string token, string date);
+        List<string> GetTimesByDate(string name, string token, string routeFrom, string routeTo, string date);
 
 
         [WebGet(UriTemplate = "/BuyTicket?name={name}&token={token}&route_from={routeFrom}&route_to={routeTo}&time={dateTime}",

@@ -5,6 +5,7 @@ using RestSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ServiceModel.Web;
+using System.IO;
 
 namespace RestService
 {
@@ -58,7 +59,7 @@ namespace RestService
             return response.Data.d;
         }
 
-        private string CheckUser(string name, string token)
+        private bool CheckUser(string name, string token)
         {
             var info = GetUserInfo(name, token);
             var ip = info.Item1;
@@ -66,8 +67,8 @@ namespace RestService
 
 
             // --- TODO change back ---
-            return "true";
-            //return CheckToken(name, token, ip, userAgent);
+            return true;
+            //return CheckToken(name, token, ip, userAgent).ToLower() == "true";
         }
 
 
@@ -94,14 +95,13 @@ namespace RestService
         {
             //    var cl = new ServicesRegister.RegServ1();
             //    string[] methodsList = { "GetPossibleRoutes", "GetRouteDepartureTimes", "BuyTicket" };
-
             //    cl.addServiceWithMethods("RailwayRestService", methodsList);
 
 
             WebOperationContext ctx = WebOperationContext.Current;
             var checkResult = CheckUser(name, token); // false, true or expired
 
-            if (checkResult.ToLower() == "true")
+            if (checkResult)
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
                 var routesList = GetRoutesListFromDB();
@@ -119,26 +119,28 @@ namespace RestService
 
         // --- methods and fields for GetTimesByDate ---
 
-        private Dictionary<string, List<string>> currentScheduleDict;
+        //private Dictionary<string, List<string>> currentScheduleDict;
+        //private string currentSheduleStoragePath = Directory.GetCurrentDirectory() + "\\App_Data\\currentSheduleStorage.json";
 
-        private List<string> GetTimesFromCurrentSheduleDict(string date)
+        private List<string> GetTimesByDateFromDB(string routeFrom, string routeTo, string date)
         {
-            if (currentScheduleDict.ContainsKey(date))
+            var currentScheduleDict = GetSheduleDictFromDB(routeFrom, routeTo);
+            if (currentScheduleDict != null && currentScheduleDict.ContainsKey(date))
             {
                 return currentScheduleDict[date];
             }
             return null;
         }
 
-        public List<string> GetTimesByDate(string name, string token, string date)
+        public List<string> GetTimesByDate(string name, string token, string routeFrom, string routeTo, string date)
         {
             WebOperationContext ctx = WebOperationContext.Current;
             var checkResult = CheckUser(name, token);
 
-            if (checkResult.ToLower() == "true")
+            if (checkResult)
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
-                var currentTimes = GetTimesFromCurrentSheduleDict(date);
+                var currentTimes = GetTimesByDateFromDB(routeFrom, routeTo, date);
                 return currentTimes;
             }
             else
@@ -150,16 +152,22 @@ namespace RestService
 
         //--- methods for GetRouteDepartureTimes ---
 
-        private Dictionary<string, List<string>> GetTimesDictFromDB(string routeFrom, string routeTo)
+        private Dictionary<string, List<string>> GetSheduleDictFromDB(string routeFrom, string routeTo)
         {
-            var client = new RestClient(dbServiceAddress);
+            //var client = new RestClient(dbServiceAddress);
 
-            string relativeRequest = "/" + routeFrom + "/" + routeTo;
-            var timesRequest = new RestRequest("GetDestination" + relativeRequest, Method.GET);
+            //string relativeRequest = "/" + routeFrom + "/" + routeTo;
+            //var timesRequest = new RestRequest("GetDestination" + relativeRequest, Method.GET);
 
-            var timesDict = client.Execute<Dictionary<string, List<string>>>(timesRequest);
-            return timesDict.Data;
-
+            //var timesDict = client.Execute<Dictionary<string, List<string>>>(timesRequest);
+            //return timesDict.Data;
+            var temp = new Dictionary<string, List<string>>
+            {
+                ["03.06.2018"] = new List<string> { "15.00", "17.00" },
+                ["07.06.2018"] = new List<string> { "11.00", "01.00" },
+                ["10.07.2018"] = new List<string> { "23.00", "11.00" }
+            };
+            return temp;
         }
 
 
@@ -168,11 +176,11 @@ namespace RestService
             WebOperationContext ctx = WebOperationContext.Current;
             var checkResult = CheckUser(name, token);
 
-            if (checkResult.ToLower() == "true")
+            if (checkResult)
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
-                currentScheduleDict = GetTimesDictFromDB(routeFrom, routeTo);
-                
+                var currentScheduleDict = GetSheduleDictFromDB(routeFrom, routeTo);
+
                 return new List<string>(currentScheduleDict.Keys);
             }
             else
@@ -181,7 +189,6 @@ namespace RestService
                 return null;
             }
         }
-
 
 
         // --- methods for BuyTicket ---
@@ -204,11 +211,11 @@ namespace RestService
             WebOperationContext ctx = WebOperationContext.Current;
             var checkResult = CheckUser(name, token);
 
-            if (checkResult.ToLower() == "true")
+            if (checkResult)
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
                 var ticketResult = BuyTicketFromDB(routeFrom, routeTo, dateTime);
-                return ticketResult; // TODO CHANGE THIS
+                return ticketResult; // TODO CHANGE THIS 
             }
             else
             {

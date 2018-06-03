@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="RailwayRestService.svc" />
+    <Content Include="App_Data\currentSheduleStorage.json" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -98,9 +99,7 @@
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Web References\ServicesRegister\RegServ1.wsdl" />
