@@ -19,11 +19,17 @@ namespace RestService
         List<Route> GetPossibleRoutes(string name, string token);
 
 
-        [WebGet(UriTemplate = "/GetRouteDepartureTimes?name={name}&token={token}&route_from={routeFrom}&route_to={routeTo}",
+        [WebGet(UriTemplate = "/GetRouteDepartureDates?name={name}&token={token}&route_from={routeFrom}&route_to={routeTo}",
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json)]
         [OperationContract]
-        Dictionary<string, List<string>> GetRouteDepartureTimes(string name, string token, string routeFrom, string routeTo);
+        List<string> GetRouteDepartureDates(string name, string token, string routeFrom, string routeTo);
+
+        [WebGet(UriTemplate = "/GetTimesByDate?name={name}&token={token}&date={date}",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        List<string> GetTimesByDate(string name, string token, string date);
 
 
         [WebGet(UriTemplate = "/BuyTicket?name={name}&token={token}&route_from={routeFrom}&route_to={routeTo}&time={dateTime}",
@@ -32,6 +38,10 @@ namespace RestService
         [OperationContract]
         TicketResponse BuyTicket(string name, string token, string routeFrom, string routeTo, string dateTime);
 
+
+        //[WebGet(UriTemplate = "/AddToServicesRegister?name={serviceName}&={token}")]
+        //[OperationContract]
+        //void AddToServicesRegister(string name, string token);
 
         //// TODO: delete from interface
         //[WebGet(UriTemplate = "/CheckRequest?name={name}&useragent={useragent}&token={token}&ip={ip}"
@@ -52,7 +62,7 @@ namespace RestService
 
         [DataMember]
         public string route_from { get; set; }
-    
+
     }
 
     [DataContract]

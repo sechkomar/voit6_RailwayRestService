@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="getServices">
+        <s:complexType />
+      </s:element>
+      <s:element name="getServicesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getServicesResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:any minOccurs="0" maxOccurs="unbounded" namespace="http://www.w3.org/2001/XMLSchema" processContents="lax" />
+                  <s:any minOccurs="1" namespace="urn:schemas-microsoft-com:xml-diffgram-v1" processContents="lax" />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getMethods">
+        <s:complexType />
+      </s:element>
+      <s:element name="getMethodsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getMethodsResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:any minOccurs="0" maxOccurs="unbounded" namespace="http://www.w3.org/2001/XMLSchema" processContents="lax" />
+                  <s:any minOccurs="1" namespace="urn:schemas-microsoft-com:xml-diffgram-v1" processContents="lax" />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="addServiceWithMethods">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ServiceName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Methods" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="addServiceWithMethodsResponse">
+        <s:complexType />
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="getServicesSoapIn">
+    <wsdl:part name="parameters" element="tns:getServices" />
+  </wsdl:message>
+  <wsdl:message name="getServicesSoapOut">
+    <wsdl:part name="parameters" element="tns:getServicesResponse" />
+  </wsdl:message>
+  <wsdl:message name="getMethodsSoapIn">
+    <wsdl:part name="parameters" element="tns:getMethods" />
+  </wsdl:message>
+  <wsdl:message name="getMethodsSoapOut">
+    <wsdl:part name="parameters" element="tns:getMethodsResponse" />
+  </wsdl:message>
+  <wsdl:message name="addServiceWithMethodsSoapIn">
+    <wsdl:part name="parameters" element="tns:addServiceWithMethods" />
+  </wsdl:message>
+  <wsdl:message name="addServiceWithMethodsSoapOut">
+    <wsdl:part name="parameters" element="tns:addServiceWithMethodsResponse" />
+  </wsdl:message>
+  <wsdl:portType name="RegServ1Soap">
+    <wsdl:operation name="getServices">
+      <wsdl:input message="tns:getServicesSoapIn" />
+      <wsdl:output message="tns:getServicesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getMethods">
+      <wsdl:input message="tns:getMethodsSoapIn" />
+      <wsdl:output message="tns:getMethodsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="addServiceWithMethods">
+      <wsdl:input message="tns:addServiceWithMethodsSoapIn" />
+      <wsdl:output message="tns:addServiceWithMethodsSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="RegServ1Soap" type="tns:RegServ1Soap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="getServices">
+      <soap:operation soapAction="http://tempuri.org/getServices" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getMethods">
+      <soap:operation soapAction="http://tempuri.org/getMethods" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="addServiceWithMethods">
+      <soap:operation soapAction="http://tempuri.org/addServiceWithMethods" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="RegServ1Soap12" type="tns:RegServ1Soap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="getServices">
+      <soap12:operation soapAction="http://tempuri.org/getServices" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getMethods">
+      <soap12:operation soapAction="http://tempuri.org/getMethods" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="addServiceWithMethods">
+      <soap12:operation soapAction="http://tempuri.org/addServiceWithMethods" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="RegServ1">
+    <wsdl:port name="RegServ1Soap" binding="tns:RegServ1Soap">
+      <soap:address location="http://localhost:49867/RegServ1.asmx" />
+    </wsdl:port>
+    <wsdl:port name="RegServ1Soap12" binding="tns:RegServ1Soap12">
+      <soap12:address location="http://localhost:49867/RegServ1.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

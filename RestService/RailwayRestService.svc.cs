@@ -14,15 +14,16 @@ namespace RestService
         private string paymentServiceAddress = "http://payment-service-uni.apphb.com/PaymentRest.svc";
 
         // --- methods and classes for CheckUser ---
-        private string CreateBadCheckResponse(string checkResult)
-        {
-            JObject badResult = new JObject
-            {
-                ["result"] = checkResult
-            };
-            return badResult.ToString();
 
-        }
+        //private string CreateBadCheckResponse(string checkResult)
+        //{
+        //    JObject badResult = new JObject
+        //    {
+        //        ["result"] = checkResult
+        //    };
+        //    return badResult.ToString();
+
+        //}
 
         private Tuple<string, string> GetUserInfo(string name, string token)
         {
@@ -91,6 +92,12 @@ namespace RestService
 
         public List<Route> GetPossibleRoutes(string name, string token)
         {
+            //    var cl = new ServicesRegister.RegServ1();
+            //    string[] methodsList = { "GetPossibleRoutes", "GetRouteDepartureTimes", "BuyTicket" };
+
+            //    cl.addServiceWithMethods("RailwayRestService", methodsList);
+
+
             WebOperationContext ctx = WebOperationContext.Current;
             var checkResult = CheckUser(name, token); // false, true or expired
 
@@ -110,6 +117,36 @@ namespace RestService
             }
         }
 
+        // --- methods and fields for GetTimesByDate ---
+
+        private Dictionary<string, List<string>> currentScheduleDict;
+
+        private List<string> GetTimesFromCurrentSheduleDict(string date)
+        {
+            if (currentScheduleDict.ContainsKey(date))
+            {
+                return currentScheduleDict[date];
+            }
+            return null;
+        }
+
+        public List<string> GetTimesByDate(string name, string token, string date)
+        {
+            WebOperationContext ctx = WebOperationContext.Current;
+            var checkResult = CheckUser(name, token);
+
+            if (checkResult.ToLower() == "true")
+            {
+                ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
+                var currentTimes = GetTimesFromCurrentSheduleDict(date);
+                return currentTimes;
+            }
+            else
+            {
+                ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                return null;
+            }
+        }
 
         //--- methods for GetRouteDepartureTimes ---
 
@@ -125,15 +162,8 @@ namespace RestService
 
         }
 
-        private Dictionary<string, List<string>> FilterTimesDict(Dictionary<string, List<string>> timesDict,
-                                                    string routeFrom, string routeTo)
-        {
-            // some actions with filtering
-            return timesDict;
-        }
 
-
-        public Dictionary<string, List<string>> GetRouteDepartureTimes(string name, string token, string routeFrom, string routeTo)
+        public List<string> GetRouteDepartureDates(string name, string token, string routeFrom, string routeTo)
         {
             WebOperationContext ctx = WebOperationContext.Current;
             var checkResult = CheckUser(name, token);
@@ -141,10 +171,9 @@ namespace RestService
             if (checkResult.ToLower() == "true")
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
-
-                var timesDict = GetTimesDictFromDB(routeFrom, routeTo);
-                var filterTimesDict = FilterTimesDict(timesDict, routeFrom, routeTo);
-                return filterTimesDict;
+                currentScheduleDict = GetTimesDictFromDB(routeFrom, routeTo);
+                
+                return new List<string>(currentScheduleDict.Keys);
             }
             else
             {
@@ -187,7 +216,6 @@ namespace RestService
                 return null;
             }
         }
-
 
     }
 }
