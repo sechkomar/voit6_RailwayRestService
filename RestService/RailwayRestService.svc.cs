@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Web;
 using RestSharp;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.ServiceModel.Web;
-using System.IO;
 
 namespace RestService
 {
@@ -101,26 +98,31 @@ namespace RestService
             WebOperationContext ctx = WebOperationContext.Current;
             var checkResult = CheckUser(name, token); // false, true or expired
 
-            if (checkResult)
+            try
             {
-                ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
-                var routesList = GetRoutesListFromDB();
+                if (checkResult)
+                {
+                    ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
+                    var routesList = GetRoutesListFromDB();
 
-                // some actions maybe later
+                    // some actions maybe later
 
-                return routesList;
+                    return routesList;
+                }
+                else
+                {
+                    ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                    return null;
+                }
             }
-            else
+            catch
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
                 return null;
             }
         }
 
-        // --- methods and fields for GetTimesByDate ---
-
-        //private Dictionary<string, List<string>> currentScheduleDict;
-        //private string currentSheduleStoragePath = Directory.GetCurrentDirectory() + "\\App_Data\\currentSheduleStorage.json";
+        // --- methods for GetTimesByDate ---
 
         private List<string> GetTimesByDateFromDB(string routeFrom, string routeTo, string date)
         {
@@ -137,13 +139,21 @@ namespace RestService
             WebOperationContext ctx = WebOperationContext.Current;
             var checkResult = CheckUser(name, token);
 
-            if (checkResult)
+            try
             {
-                ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
-                var currentTimes = GetTimesByDateFromDB(routeFrom, routeTo, date);
-                return currentTimes;
+                if (checkResult)
+                {
+                    ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
+                    var currentTimes = GetTimesByDateFromDB(routeFrom, routeTo, date);
+                    return currentTimes;
+                }
+                else
+                {
+                    ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                    return null;
+                }
             }
-            else
+            catch
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
                 return null;
@@ -176,14 +186,22 @@ namespace RestService
             WebOperationContext ctx = WebOperationContext.Current;
             var checkResult = CheckUser(name, token);
 
-            if (checkResult)
+            try
             {
-                ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
-                var currentScheduleDict = GetSheduleDictFromDB(routeFrom, routeTo);
+                if (checkResult)
+                {
+                    ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
+                    var currentScheduleDict = GetSheduleDictFromDB(routeFrom, routeTo);
 
-                return new List<string>(currentScheduleDict.Keys);
+                    return new List<string>(currentScheduleDict.Keys);
+                }
+                else
+                {
+                    ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                    return null;
+                }
             }
-            else
+            catch
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
                 return null;
@@ -226,13 +244,21 @@ namespace RestService
             WebOperationContext ctx = WebOperationContext.Current;
             var checkResult = CheckUser(name, token);
 
-            if (checkResult)
+            try
             {
-                ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
-                var ticketResult = BuyTicketFromDB(routeFrom, routeTo, dateTime);
-                return ticketResult;
+                if (checkResult)
+                {
+                    ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
+                    var ticketResult = BuyTicketFromDB(routeFrom, routeTo, dateTime);
+                    return ticketResult;
+                }
+                else
+                {
+                    ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                    return null;
+                }
             }
-            else
+            catch
             {
                 ctx.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
                 return null;
