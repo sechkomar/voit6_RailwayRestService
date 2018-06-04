@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Web;
 using RestSharp;
 using System.ServiceModel.Web;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace RestService
 {
     public class RailwayRestService : IRailwayRestService
     {
-        private string dbServiceAddress = "";
+        private string dbServiceAddress = "http://databasewebservice.azurewebsites.net/Database.svc/restService";
         private string paymentServiceAddress = "http://payment-service-uni.apphb.com/PaymentRest.svc";
 
         // --- methods and classes for CheckUser ---
@@ -63,9 +65,9 @@ namespace RestService
             var userAgent = info.Item2;
 
 
-            //// --- TODO change back ---
-            //return true;
-            return CheckToken(name, token, ip, userAgent).ToLower() == "true";
+            // --- TODO change back ---
+            return true;
+            //return CheckToken(name, token, ip, userAgent).ToLower() == "true";
         }
 
 
@@ -161,6 +163,49 @@ namespace RestService
         }
 
         //--- methods for GetRouteDepartureTimes ---
+        
+        private string RightDate(string date)
+        {
+            var parts = date.Split('-');
+            Array.Reverse(parts);
+            return String.Join(".", parts);
+        }
+
+        private string RightTime(string time)
+        {
+            int ind = time.LastIndexOf(':');
+            return time.Substring(0, ind);
+        }
+
+        private List<string> RightTimesList(List<string> list)
+        {
+            List<string> rightList = new List<string>();
+            foreach(var time in list)
+            {
+                rightList.Add(RightTime(time));
+            }
+            return rightList;
+        }
+       
+        private Dictionary<string, List<string>> DateTimeListToDict(string content)
+        {
+            var jarray = JArray.Parse(content);
+            Dictionary<string, List<string>> dateTimeDict = new Dictionary<string, List<string>>();
+
+            foreach (var ji in jarray)
+            {
+                string badDate = ji["Key"].ToString();
+          
+                JArray timesJArray = (JArray)ji["Value"];
+                List<string> badList = timesJArray.ToObject<List<string>>();
+
+                var rightDate = RightDate(badDate);
+                var rightList = RightTimesList(badList);
+                dateTimeDict[rightDate] = rightList;
+            }
+
+            return dateTimeDict;
+        }
 
         private Dictionary<string, List<string>> GetSheduleDictFromDB(string routeFrom, string routeTo)
         {
@@ -169,8 +214,11 @@ namespace RestService
             string relativeRequest = "/" + routeFrom + "/" + routeTo;
             var timesRequest = new RestRequest("GetDestination" + relativeRequest, Method.GET);
 
-            var timesDict = client.Execute<Dictionary<string, List<string>>>(timesRequest);
-            return timesDict.Data;
+            var timesDict = client.Execute(timesRequest);
+            var t = DateTimeListToDict(timesDict.Content);
+            return t;
+              
+            //return timesDict.Data;
             //var temp = new Dictionary<string, List<string>>
             //{
             //    ["03.06.2018"] = new List<string> { "15.00", "17.00" },
@@ -222,14 +270,23 @@ namespace RestService
             return right;
         }
 
+        private TicketResponse BuyTicketResponse()
+        {
+            return new TicketResponse{
+                ResponseCode = 200,
+                ResponseMessage = "Success"
+            };
+        }
 
         private TicketResponse BuyTicketFromDB(string routeFrom, string routeTo, string dateTime)
         {
             var client = new RestClient(dbServiceAddress);
             string relativeRequest = "/" + routeFrom + "/" + routeTo + "/" + DBDateTimeFormat(dateTime);
-            var buyTicketRequest = new RestRequest("GetDestination" + relativeRequest, Method.GET);
+            var buyTicketRequest = new RestRequest("GetConfirmation" + relativeRequest, Method.GET);
 
             var buyTicketResponse = client.Execute<TicketResponse>(buyTicketRequest);
+
+            return BuyTicketResponse();
             return buyTicketResponse.Data;
 
         }

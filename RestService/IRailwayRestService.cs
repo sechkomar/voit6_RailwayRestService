@@ -10,7 +10,7 @@ namespace RestService
 {
     [ServiceContract]
     public interface IRailwayRestService
-    {
+    {   
 
         [WebGet(UriTemplate = "/GetPossibleRoutes?name={name}&token={token}",
             RequestFormat = WebMessageFormat.Json,
